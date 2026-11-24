@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111b3d">
+<title>KING AI Finance Game</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101a38;color:#fff;font-family:Arial,sans-serif}
+header{padding:22px 16px;background:linear-gradient(120deg,#172d64,#713bb1)}
+header h1{margin:0;font-size:25px}
+header p{color:#e0e8ff}
+main{max-width:950px;margin:auto;padding:16px}
+.panel,.stat{background:#1d2c53;border:1px solid #394d7c;border-radius:16px;padding:16px;margin-bottom:15px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat strong{display:block;font-size:23px;color:#ffdc76;margin-top:8px}
+h2{font-size:19px;margin-top:0}
+button{min-height:46px;padding:12px 16px;border:0;border-radius:10px;background:#ffdc76;color:#18203c;font-weight:bold;cursor:pointer;margin:5px 4px 5px 0}
+button.secondary{background:#354b78;color:white}
+button:disabled{opacity:.5}
+input{width:100%;max-width:400px;padding:13px;border:1px solid #8294bd;border-radius:9px;font-size:16px}
+.small{font-size:13px;color:#c5d2f0}
+.result{min-height:24px;margin-top:10px;line-height:1.5}
+.progress{height:10px;background:#39496c;border-radius:20px;overflow:hidden}
+.progress div{height:100%;background:#4ce1a1;width:0;transition:width .4s}
+.badge{display:inline-block;background:#394b77;padding:7px 10px;border-radius:20px;margin:4px;font-size:13px}
+.world{position:relative;overflow:hidden;min-height:205px;border-radius:15px;padding:18px;background:linear-gradient(#55b9ed 0%,#a5e6ef 67%,#6cc77b 67%,#398b54 100%);color:#142c48}
+.world h2{color:#142c48}
+.cloud{position:absolute;font-size:35px;animation:drift 12s linear infinite}
+.cloud.one{top:20px;left:8%}
+.cloud.two{top:55px;left:65%;animation-duration:17s}
+.sun{position:absolute;right:25px;top:16px;font-size:38px;animation:pulse 3s infinite}
+.city{position:absolute;bottom:22px;display:flex;align-items:end;gap:9px}
+.building{font-size:40px;animation:bob 2s ease-in-out infinite}
+.building:nth-child(2){animation-delay:.4s}
+.building:nth-child(3){animation-delay:.8s}
+.coin{position:absolute;right:18%;bottom:38px;font-size:26px;animation:float 2s ease-in-out infinite}
+@keyframes drift{0%{transform:translateX(-20px)}50%{transform:translateX(30px)}100%{transform:translateX(-20px)}}
+@keyframes pulse{50%{transform:scale(1.15)}}
+@keyframes bob{50%{transform:translateY(-7px)}}
+@keyframes float{50%{transform:translateY(-15px) rotate(15deg)}}
+.choice{display:block;width:100%;text-align:left;background:#354b78;color:white;margin:8px 0}
+.tutor-answer{background:#293d69;border-radius:12px;padding:13px;margin-top:12px;line-height:1.5}
+.business-card{background:#293d69;padding:13px;border-radius:12px;margin:9px 0}
+footer{text-align:center;color:#b9c8e8;padding:25px;font-size:12px}
+@media(max-width:500px){.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}}
+</style>
+</head>
+<body>
+<header>
+<h1>👑 KING AI FINANCE GAME</h1>
+<p>Explore Finance City. Learn money skills. Become a virtual money master!</p>
+</header>
+
+<main>
+<section class="world">
+<div class="cloud one">☁️</div>
+<div class="cloud two">☁️</div>
+<div class="sun">☀️</div>
+<h2>🌍 Welcome to Finance City!</h2>
+<p>Explore the city and complete your money missions.</p>
+<div class="city">
+<span class="building">🏦</span>
+<span class="building">🏪</span>
+<span class="building">🏫</span>
+<span class="building">🏭</span>
+</div>
+<div class="coin">🪙</div>
+</section>
+
+<section class="stats">
+<div class="stat">🪙 Virtual coins<strong id="coins">100</strong></div>
+<div class="stat">⭐ XP<strong id="xp">0</strong></div>
+<div class="stat">🏆 Level<strong id="level">Beginner</strong></div>
+</section>
+
+<section class="panel">
+<h2>📊 Player dashboard</h2>
+<p id="missionCount">Missions completed: 0 / 5</p>
+<div class="progress"><div id="bar"></div></div>
+<p id="levelMessage" class="small">Complete missions to earn XP and unlock new levels.</p>
+<div id="badges"><span class="badge">🎯 New learner</span></div>
+</section>
+
+<section class="panel">
+<h2>🏦 Virtual bank</h2>
+<p>Available coins: <b id="available">100</b></p>
+<p>Savings: <b id="savings">0</b></p>
+<label for="deposit">Coins to save</label><br><br>
+<input id="deposit" type="number" min="1" placeholder="Enter an amount">
+<button onclick="depositCoins()">Save coins</button>
+<div id="bankResult" class="result"></div>
+<p class="small">This is a fictional game bank. It does not hold real money.</p>
+</section>
+
+<section class="panel">
+<h2>🎮 Mission centre</h2>
+<p class="small">Complete a challenge to earn 10 XP and 10 virtual coins.</p>
+<div id="missions"></div>
+<div id="challenge"></div>
+<div id="answerResult" class="result"></div>
+</section>
+
+<section class="panel">
+<h2>🏪 Business simulation centre</h2>
+<p>Choose a pretend business. Manage its costs and sales.</p>
+<div class="business-card">
+<h3>🍋 Lemonade stand</h3>
+<p>Supplies cost 15 coins. Pretend sales bring in 30 coins.</p>
+<button onclick="runBusiness('lemonade')">Run lemonade stand</button>
+</div>
+<div class="business-card">
+<h3>📚 Bookshop</h3>
+<p>Books cost 25 coins. Pretend sales bring in 45 coins.</p>
+<button onclick="runBusiness('bookshop')">Run bookshop</button>
+</div>
+<div class="business-card">
+<h3>🥐 Bakery</h3>
+<p>Baking supplies cost 20 coins. Pretend sales bring in 35 coins.</p>
+<button onclick="runBusiness('bakery')">Run bakery</button>
+</div>
+<p>Business rounds played: <b id="rounds">0</b></p>
+<p>Business learning coins earned: <b id="businessCoins">0</b></p>
+<div id="businessResult" class="result"></div>
+<p class="small">All businesses and earnings are fictional simulations.</p>
+</section>
+
+<section class="panel">
+<h2>🤖 KING AI-style finance tutor</h2>
+<p>Ask a question about saving, budgeting, spending, earning or business.</p>
+<label for="tutorInput">Your question</label><br><br>
+<input id="tutorInput" type="text" placeholder="Example: What is a budget?">
+<button onclick="askTutor()">Ask tutor</button>
+<div id="tutorAnswer" class="tutor-answer" aria-live="polite">
+Hello! Ask me a money-learning question.
+</div>
+<p class="small">This prototype uses prepared explanations. A live AI connection can be added in a later stage.</p>
+</section>
+</main>
+
+<footer>KING AI FINANCE GAME · Educational prototype · Fictional coins only</footer>
+
+<script>
+const questions=[
+{name:"Saving challenge",q:"You want an item costing 30 coins. You have 20. What is a wise choice?",a:["Save towards the goal","Spend the coins on something else","Give up on the goal"],correct:0,why:"Saving helps you reach a goal that costs more than you currently have."},
+{name:"Smart spending",q:"You have 50 coins. A useful school item costs 30. What is sensible?",a:["Buy it and keep 20 coins","Spend all 50 on random items","Ignore your needs"],correct:0,why:"You meet a useful need and keep some coins for later."},
+{name:"Build a budget",q:"You have 100 coins. Which budget balances your money?",a:["Save 50, school supplies 30, fun 20","Spend 100 on fun","Spend 90 and save 20"],correct:0,why:"50 + 30 + 20 = 100. Your budget balances."},
+{name:"Needs and wants",q:"Which is usually a school need?",a:["A required notebook","A fourth toy","A decorative game skin"],correct:0,why:"A notebook can help you complete schoolwork."},
+{name:"Business basics",q:"A pretend shop receives 40 coins and spends 25 on supplies. What remains?",a:["15 coins","25 coins","65 coins"],correct:0,why:"40 − 25 = 15 coins. This simple example shows a business gain."}
+];
+
+let state={};
+try{state=JSON.parse(localStorage.getItem("kingFinanceV2"))||{};}catch(e){}
+state={
+ coins:Number(state.coins??100),
+ savings:Number(state.savings??0),
+ xp:Number(state.xp??0),
+ business:Number(state.business??0),
+ rounds:Number(state.rounds??0),
+ completed:Array.isArray(state.completed)?state.completed:[]
+};
+
+function save(){
+ localStorage.setItem("kingFinanceV2",JSON.stringify(state));
+ render();
+}
+function getLevel(){
+ if(state.xp>=50)return "Expert";
+ if(state.xp>=30)return "Advanced";
+ if(state.xp>=10)return "Intermediate";
+ return "Beginner";
+}
+function render(){
+ document.getElementById("coins").textContent=state.coins;
+ document.getElementById("available").textContent=state.coins;
+ document.getElementById("savings").textContent=state.savings;
+ document.getElementById("xp").textContent=state.xp;
+ document.getElementById("level").textContent=getLevel();
+ document.getElementById("rounds").textContent=state.rounds;
+ document.getElementById("businessCoins").textContent=state.business;
+ document.getElementById("missionCount").textContent="Missions completed: "+state.completed.length+" / 5";
+ document.getElementById("bar").style.width=(state.completed.length/5*100)+"%";
+ document.getElementById("levelMessage").textContent=
+ "Next level: "+(state.xp<10?10:state.xp<30?30:state.xp<50?50:"All levels unlocked")+" XP";
+ document.getElementById("badges").innerHTML=
+ (state.completed.length>=5?'<span class="badge">🏆 Finance Champion</span>':
+ state.completed.length>=3?'<span class="badge">🌟 Smart Money Learner</span>':
+ state.completed.length>=1?'<span class="badge">🥇 First Mission</span>':
+ '<span class="badge">🎯 New learner</span>');
+ document.getElementById("missions").innerHTML=questions.map((q,i)=>
+ '<button '+(state.completed.includes(i)?'disabled class="secondary"':'')+
+ ' onclick="openMission('+i+')">'+
+ (state.completed.includes(i)?"✓ ":"")+q.name+'</button>').join("");
+}
+function depositCoins(){
+ const field=document.getElementById("deposit");
+ const amount=Number(field.value);
+ if(!Number.isInteger(amount)||amount<=0||amount>state.coins){
+ document.getElementById("bankResult").textContent="Enter a whole number of available coins.";
+ return;
+ }
+ state.coins-=amount;
+ state.savings+=amount;
+ field.value="";
+ document.getElementById("bankResult").textContent="Great saving! Your virtual savings increased.";
+ save();
+}
+function openMission(i){
+ const q=questions[i];
+ document.getElementById("answerResult").textContent="";
+ document.getElementById("challenge").innerHTML=
+ "<h3>"+q.name+"</h3><p>"+q.q+"</p>"+
+ q.a.map((a,n)=>'<button class="choice" onclick="answer('+i+','+n+')">'+
+ String.fromCharCode(65+n)+". "+a+"</button>").join("");
+}
+function answer(i,n){
+ const q=questions[i];
+ const out=document.getElementById("answerResult");
+ if(n!==q.correct){
+ out.textContent="Not quite. Try again and think about the choices.";
+ return;
+ }
+ if(!state.completed.includes(i)){
+ state.completed.push(i);
+ state.xp+=10;
+ state.coins+=10;
+ out.textContent="Correct! +10 XP and +10 virtual coins. "+q.why;
+ save();
+ }else{
+ out.textContent="You already completed this mission. "+q.why;
+ }
+ document.getElementById("challenge").innerHTML="";
+}
+function runBusiness(type){
+ const businesses={
+ lemonade:{name:"Lemonade stand",cost:15,sales:30},
+ bookshop:{name:"Bookshop",cost:25,sales:45},
+ bakery:{name:"Bakery",cost:20,sales:35}
+ };
+ const b=businesses[type];
+ const gain=b.sales-b.cost;
+ state.rounds++;
+ state.business+=gain;
+ state.coins+=gain;
+ document.getElementById("businessResult").textContent=
+ b.name+": sales "+b.sales+" − costs "+b.cost+" = "+gain+
+ " virtual coins gained! Your game balance has increased.";
+ save();
+}
+function askTutor(){
+ const raw=document.getElementById("tutorInput").value.trim().toLowerCase();
+ const out=document.getElementById("tutorAnswer");
+ if(!raw){out.textContent="Type a question first, and I will help you learn.";return;}
+ let answer="";
+ if(raw.includes("budget")){
+ answer="A budget is a plan for using your coins. Example: with 100 coins, save 40, spend 40 on school supplies and use 20 for fun. The parts add up to 100.";
+ }else if(raw.includes("sav")){
+ answer="Saving means keeping some coins for later. Choose a goal, work out how many coins you need and track how close you are to reaching it.";
+ }else if(raw.includes("profit")||raw.includes("business")||raw.includes("earn")){
+ answer="A simple business gain is sales minus costs. Example: if your pretend shop receives 40 coins and spends 25 coins, the gain is 15 coins.";
+ }else if(raw.includes("need")||raw.includes("want")){
+ answer="A need is something important, such as food or a required school item. A want is something extra, such as another toy. Think about needs before wants.";
+ }else if(raw.includes("spend")||raw.includes("buy")){
+ answer="Smart spending means checking the price, deciding whether the item is useful and making sure you do not spend more coins than you have.";
+ }else if(raw.includes("coin")||raw.includes("money")){
+ answer="Coins are the game currency in this learning world. You can earn, save and plan with fictional coins to practise money decisions safely.";
+ }else{
+ answer="Good question! Try asking about saving, budgeting, needs and wants, smart spending or pretend business. These are the topics I can explain in this version.";
+ }
+ out.textContent=answer;
+}
+render();
+</script>
+</body>
+</html>
